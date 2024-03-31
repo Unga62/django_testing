@@ -18,7 +18,7 @@ def author(django_user_model):
 
 
 @pytest.fixture
-def not_author(django_user_model):  
+def not_author(django_user_model):
     return django_user_model.objects.create(username='Не автор')
 
 

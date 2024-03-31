@@ -34,7 +34,6 @@ def test_comments_order(client, news):
     assert all_timestamps == sorted_timestamps
 
 
-@pytest.mark.django_db
 @pytest.mark.parametrize(
     'parametrized_client, status',
     (

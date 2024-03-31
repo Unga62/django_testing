@@ -17,7 +17,6 @@ def test_anonymous_user_cant_create_comment(client, new_text_comment, news):
     assert Comment.objects.count() == 0
 
 
-@pytest.mark.django_db
 def test_user_can_create_comment(
     author_client,
     new_text_comment,
@@ -34,7 +33,6 @@ def test_user_can_create_comment(
     assert comment.author == author
 
 
-@pytest.mark.django_db
 def test_user_cant_use_bad_words(author_client, news):
     url = reverse('news:detail', args=(news.pk,))
     bad_words_data = {'text': f'Какой-то текст, {BAD_WORDS[0]}, еще текст'}
@@ -48,7 +46,6 @@ def test_user_cant_use_bad_words(author_client, news):
     assert Comment.objects.count() == 0
 
 
-@pytest.mark.django_db
 def test_author_can_edit_comment(author_client, comment, new_text_comment):
     url = reverse('news:edit', args=(comment.pk,))
     author_client.post(url, new_text_comment)
@@ -56,7 +53,6 @@ def test_author_can_edit_comment(author_client, comment, new_text_comment):
     assert comment.text == new_text_comment['text']
 
 
-@pytest.mark.django_db
 def test_user_cant_edit_comment_of_another_user(
     not_author_client,
     comment,
@@ -69,14 +65,12 @@ def test_user_cant_edit_comment_of_another_user(
     assert comment.text == COMMENT_TEXT
 
 
-@pytest.mark.django_db
 def test_author_can_delete_comment(author_client, slug_for_args):
     url = reverse('news:delete', args=slug_for_args)
     author_client.post(url)
     assert Comment.objects.count() == 0
 
 
-@pytest.mark.django_db
 def test_other_user_cant_delete_comment(not_author_client, slug_for_args):
     url = reverse('news:delete', args=slug_for_args)
     response = not_author_client.post(url)
