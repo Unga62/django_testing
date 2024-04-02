@@ -1,14 +1,15 @@
-import pytest
+from datetime import timedelta
 
 from django.test.client import Client
-
+from django.urls import reverse
+import pytest
 from django.conf import settings
 from django.utils import timezone
-from datetime import timedelta
 
 from news.models import Comment, News
 
-NEW_TEXT_COMMENT = 'Просто текст'
+COMMENT_COUNT = 1
+NEW_TEXT_COMMENT = {'text': 'TEXT'}
 COMMENT_TEXT = 'Текст комментария'
 
 
@@ -56,11 +57,6 @@ def comment(author, news):
 
 
 @pytest.fixture
-def slug_for_args(comment):
-    return (comment.pk,)
-
-
-@pytest.fixture
 def news_list():
     today = timezone.now()
     all_news = [
@@ -88,5 +84,40 @@ def comment_list(news, author):
 
 
 @pytest.fixture
-def new_text_comment():
-    return {'text': NEW_TEXT_COMMENT}
+def news_home_url():
+    return reverse('news:home')
+
+
+@pytest.fixture
+def news_detail_url(news):
+    return reverse('news:detail', args=(news.pk,))
+
+
+@pytest.fixture
+def comment_url(comment):
+    return reverse('news:detail', args=(comment.pk,))
+
+
+@pytest.fixture
+def edit_comment_url(comment):
+    return reverse('news:edit', args=(comment.pk,))
+
+
+@pytest.fixture
+def delete_comment_url(comment):
+    return reverse('news:delete', args=(comment.pk,))
+
+
+@pytest.fixture
+def user_login():
+    return reverse('users:login')
+
+
+@pytest.fixture
+def users_logout():
+    return reverse('users:logout')
+
+
+@pytest.fixture
+def users_signup():
+    return reverse('users:signup')

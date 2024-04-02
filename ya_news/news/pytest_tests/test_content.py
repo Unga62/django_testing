@@ -1,32 +1,28 @@
+from django.conf import settings
 import pytest
 
-from django.urls import reverse
-from django.conf import settings
+from news.forms import CommentForm
 
 
-@pytest.mark.django_db
-def test_news_count(client, news_list):
-    url = reverse('news:home')
-    response = client.get(url)
-    object_list = response.context['object_list']
-    news_count = object_list.count()
+pytestmark = pytest.mark.django_db
+
+
+def test_news_count(client, news_list, news_home_url):
+    response = client.get(news_home_url)
+    news_count = response.context['object_list'].count()
     assert news_count == settings.NEWS_COUNT_ON_HOME_PAGE
 
 
-@pytest.mark.django_db
-def test_news_order(client, news_list):
-    url = reverse('news:home')
-    response = client.get(url)
+def test_news_order(client, news_list, news_home_url):
+    response = client.get(news_home_url)
     object_list = response.context['object_list']
     all_dates = [news.date for news in object_list]
     sorted_dates = sorted(all_dates, reverse=True)
     assert all_dates == sorted_dates
 
 
-@pytest.mark.django_db
-def test_comments_order(client, news):
-    url = reverse('news:detail', args=(news.pk,))
-    response = client.get(url)
+def test_comments_order(client, news, news_detail_url):
+    response = client.get(news_detail_url)
     assert 'news' in response.context
     all_comments = news.comment_set.all()
     all_timestamps = [comment.created for comment in all_comments]
@@ -41,7 +37,15 @@ def test_comments_order(client, news):
         (pytest.lazy_fixture('author_client'), True)
     ),
 )
-def test_client_has_form(parametrized_client, status, comment):
-    url = reverse('news:detail', args=(comment.pk,))
-    response = parametrized_client.get(url)
+def test_client_has_form(
+    parametrized_client,
+    status,
+    comment,
+    admin_client,
+    comment_url
+):
+    response = parametrized_client.get(comment_url)
+    assert isinstance(
+        admin_client.get(comment_url).context['form'], CommentForm
+    )
     assert ('form' in response.context) is status
