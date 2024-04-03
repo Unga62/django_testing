@@ -1,7 +1,6 @@
 from http import HTTPStatus
 
 from pytils.translit import slugify
-
 from django.contrib.auth import get_user_model
 from django.test import Client, TestCase
 from django.urls import reverse
@@ -130,7 +129,7 @@ class TestLogicEditDeleteUnique(TestCase):
             data=self.form_data
         )
         self.assertEqual(response.status_code, HTTPStatus.NOT_FOUND)
-        Note.objects.get(slug=self.note.slug)
+        Note.objects.get(id=self.note.pk)
         self.assertEqual(self.note.text, self.OLD_TEXT)
         self.assertEqual(self.note.author, self.author)
         self.assertEqual(self.note.title, 'title')

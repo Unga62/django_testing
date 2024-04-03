@@ -1,4 +1,3 @@
-from http import HTTPStatus
 from random import choice
 
 from pytest_django.asserts import assertRedirects, assertFormError
@@ -8,6 +7,7 @@ from news.models import Comment
 from news.pytest_tests.conftest import (
     COMMENT_COUNT,
     NEW_TEXT_COMMENT,
+    NOT_FOUND
 )
 
 from news.forms import BAD_WORDS, WARNING
@@ -72,7 +72,7 @@ def test_user_cant_edit_comment_of_another_user(
     edit_comment_url
 ):
     response = not_author_client.post(edit_comment_url, NEW_TEXT_COMMENT)
-    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.status_code == NOT_FOUND
     comment_edit = Comment.objects.get(id=comment.pk)
     assert comment_edit.text == comment.text
     assert comment_edit.author == comment.author
@@ -93,6 +93,6 @@ def test_other_user_cant_delete_comment(
 ):
     initial_count = Comment.objects.count()
     response = not_author_client.post(delete_comment_url)
-    assert response.status_code == HTTPStatus.NOT_FOUND
+    assert response.status_code == NOT_FOUND
     comments_count = Comment.objects.count()
     assert initial_count == comments_count

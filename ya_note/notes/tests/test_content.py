@@ -61,4 +61,4 @@ class TestContent(TestCase):
     def test_author_not_see_notes(self):
         response = self.auth_client.get(self.LIST_URL)
         object_notes = response.context['object_list']
-        self.assertIsNot((self.note in object_notes), self.note_two)
+        self.assertNotIn(self.note_two, object_notes)

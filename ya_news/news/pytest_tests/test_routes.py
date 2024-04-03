@@ -1,5 +1,3 @@
-from http import HTTPStatus
-
 from pytest_django.asserts import assertRedirects
 import pytest
 from pytest_lazyfixture import lazy_fixture as lf
