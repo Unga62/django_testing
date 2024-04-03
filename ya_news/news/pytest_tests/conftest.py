@@ -1,9 +1,10 @@
 from datetime import timedelta
+from http import HTTPStatus
 
-from django.test.client import Client
-from django.urls import reverse
 import pytest
 from django.conf import settings
+from django.test.client import Client
+from django.urls import reverse
 from django.utils import timezone
 
 from news.models import Comment, News
@@ -11,6 +12,8 @@ from news.models import Comment, News
 COMMENT_COUNT = 1
 NEW_TEXT_COMMENT = {'text': 'TEXT'}
 COMMENT_TEXT = 'Текст комментария'
+NOT_FOUND = HTTPStatus.NOT_FOUND
+SUCCESS = HTTPStatus.OK
 
 
 @pytest.fixture

@@ -1,5 +1,5 @@
-from django.conf import settings
 import pytest
+from django.conf import settings
 
 from news.forms import CommentForm
 
@@ -15,8 +15,8 @@ def test_news_count(client, news_list, news_home_url):
 
 def test_news_order(client, news_list, news_home_url):
     response = client.get(news_home_url)
-    object_list = response.context['object_list']
-    all_dates = [news.date for news in object_list]
+    object_news = response.context['object_list']
+    all_dates = [news.date for news in object_news]
     sorted_dates = sorted(all_dates, reverse=True)
     assert all_dates == sorted_dates
 
@@ -45,7 +45,8 @@ def test_client_has_form(
     comment_url
 ):
     response = parametrized_client.get(comment_url)
-    assert isinstance(
-        admin_client.get(comment_url).context['form'], CommentForm
-    )
     assert ('form' in response.context) is status
+    if status:
+        assert isinstance(
+            admin_client.get(comment_url).context['form'], CommentForm
+        )

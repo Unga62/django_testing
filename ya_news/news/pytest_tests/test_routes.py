@@ -1,39 +1,44 @@
 from http import HTTPStatus
 
 from pytest_django.asserts import assertRedirects
-from django.test.client import Client
 import pytest
-from django.urls import reverse
+from pytest_lazyfixture import lazy_fixture as lf
+from django.test.client import Client
+
+from news.pytest_tests.conftest import (
+    SUCCESS,
+    NOT_FOUND,
+)
 
 
 @pytest.mark.django_db
 @pytest.mark.parametrize(
     'reverse_url, parametrized_client, status',
     (
-        (pytest.lazy_fixture('news_home_url'), Client(), HTTPStatus.OK),
-        (pytest.lazy_fixture('user_login'), Client(), HTTPStatus.OK),
-        (pytest.lazy_fixture('users_logout'), Client(), HTTPStatus.OK),
-        (pytest.lazy_fixture('users_signup'), Client(), HTTPStatus.OK),
-        (pytest.lazy_fixture('news_detail_url'), Client(), HTTPStatus.OK),
+        (lf('news_home_url'), Client(), SUCCESS),
+        (lf('user_login'), Client(), SUCCESS),
+        (lf('users_logout'), Client(), SUCCESS),
+        (lf('users_signup'), Client(), SUCCESS),
+        (lf('news_detail_url'), Client(), SUCCESS),
         (
-            pytest.lazy_fixture('delete_comment_url'),
-            pytest.lazy_fixture('not_author_client'),
-            HTTPStatus.NOT_FOUND
+            lf('delete_comment_url'),
+            lf('not_author_client'),
+            NOT_FOUND
         ),
         (
-            pytest.lazy_fixture('edit_comment_url'),
-            pytest.lazy_fixture('not_author_client'),
-            HTTPStatus.NOT_FOUND
+            lf('edit_comment_url'),
+            lf('not_author_client'),
+            NOT_FOUND
         ),
         (
-            pytest.lazy_fixture('delete_comment_url'),
-            pytest.lazy_fixture('author_client'),
-            HTTPStatus.OK
+            lf('delete_comment_url'),
+            lf('author_client'),
+            SUCCESS
         ),
         (
-            pytest.lazy_fixture('edit_comment_url'),
-            pytest.lazy_fixture('author_client'),
-            HTTPStatus.OK
+            lf('edit_comment_url'),
+            lf('author_client'),
+            SUCCESS
         ),
     )
 )
@@ -47,15 +52,13 @@ def test_pages_availability_for_anonymous_user(
 
 
 @pytest.mark.parametrize(
-    'name, comment_object',
+    'reverse_url, comment_object',
     (
-        ('news:delete', pytest.lazy_fixture('comment')),
-        ('news:edit', pytest.lazy_fixture('comment')),
+        (lf('delete_comment_url'), lf('comment')),
+        (lf('edit_comment_url'), lf('comment')),
     ),
 )
-def test_redirects(client, name, comment_object):
-    login_url = reverse('users:login')
-    url = reverse(name, args=(comment_object.pk,))
-    expected_url = f'{login_url}?next={url}'
-    response = client.get(url)
+def test_redirects(client, reverse_url, comment_object, user_login):
+    expected_url = f'{user_login}?next={reverse_url}'
+    response = client.get(reverse_url)
     assertRedirects(response, expected_url)

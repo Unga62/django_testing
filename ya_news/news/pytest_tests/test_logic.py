@@ -9,6 +9,7 @@ from news.pytest_tests.conftest import (
     COMMENT_COUNT,
     NEW_TEXT_COMMENT,
 )
+
 from news.forms import BAD_WORDS, WARNING
 
 
@@ -74,6 +75,8 @@ def test_user_cant_edit_comment_of_another_user(
     assert response.status_code == HTTPStatus.NOT_FOUND
     comment_edit = Comment.objects.get(id=comment.pk)
     assert comment_edit.text == comment.text
+    assert comment_edit.author == comment.author
+    assert comment_edit.news == comment.news
 
 
 def test_author_can_delete_comment(author_client, comment, delete_comment_url):
